@@ -1,0 +1,8 @@
+<resources>
+    <string name="app_name">Vaga</string>
+    <string name="refresh">Refresh</string>
+    <string name="start_from">Start From</string>
+    <string name="from_here">From Here</string>
+    <string name="start_from">Start From</string>
+    <string name="directions_btn">Get Directions</string>
+</resources>

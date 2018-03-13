@@ -1,0 +1,122 @@
+<?xml version="1.0" encoding="utf-8"?>
+<android.support.constraint.ConstraintLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:app="http://schemas.android.com/apk/res-auto"
+    xmlns:tools="http://schemas.android.com/tools"
+    android:layout_width="match_parent"
+    android:layout_height="match_parent"
+    tools:context="com.josephyaconelli.vaga.MainActivity">
+
+
+    <LinearLayout
+        android:layout_width="match_parent"
+        android:layout_height="match_parent"
+        android:orientation="vertical"
+        >
+
+
+        <LinearLayout
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:orientation="horizontal"
+            android:layout_marginTop="25dp"
+            android:layout_gravity="start"
+            android:layout_marginBottom="5dp"
+            android:layout_marginStart="10dp"
+            android:layout_marginEnd="5dp"
+            >
+
+            <fragment
+                android:layout_width="280dp"
+                android:layout_height="50dp"
+                android:background="#eee"
+                android:padding="5dp"
+                android:hint="@string/start_from"
+                android:id="@+id/origin_auto_complete"
+                android:name="com.google.android.gms.location.places.ui.PlaceAutocompleteFragment"
+                />
+
+            <Button
+                android:id="@+id/fromhere_btn"
+                android:layout_width="fill_parent"
+                android:layout_height="match_parent"
+                android:padding="4dip"
+                android:layout_gravity="fill"
+                android:text="@string/from_here"
+                />
+
+        </LinearLayout>
+
+        <LinearLayout
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:orientation="horizontal"
+            android:layout_gravity="left"
+            android:layout_margin="10dp"
+            >
+
+
+
+            <fragment
+                android:layout_width="280dp"
+                android:layout_height="50dp"
+                android:background="#eee"
+                android:padding="5dp"
+                android:hint="@string/start_from"
+                android:id="@+id/destination_auto_complete"
+                android:name="com.google.android.gms.location.places.ui.PlaceAutocompleteFragment"
+                />
+
+        </LinearLayout>
+
+
+
+            <Button
+                android:id="@+id/getdirection_btn"
+                android:layout_width="270dp"
+                android:layout_height="50dp"
+                android:text="@string/directions_btn"
+                android:layout_gravity="center_horizontal"
+                android:background="#00ee99"
+                android:layout_margin="5dp"
+
+                />
+
+        <View
+            android:layout_width="match_parent"
+            android:layout_height="2dp"
+            android:layout_margin="10dp"
+            android:background="@color/colorPrimary"
+            >
+
+        </View>
+
+        <ProgressBar
+            android:id="@+id/directions_pb"
+            android:layout_width="50dp"
+            android:layout_height="50dp"
+            android:layout_gravity="center"
+            android:visibility="gone"
+            />
+
+        <ScrollView
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:layout_margin="10dp"
+            >
+            <TextView
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:id="@+id/result_tv"
+                android:textSize="20sp"
+                app:layout_constraintBottom_toBottomOf="parent"
+                app:layout_constraintLeft_toLeftOf="parent"
+                app:layout_constraintRight_toRightOf="parent"
+                app:layout_constraintTop_toTopOf="parent"
+
+                />
+        </ScrollView>
+
+
+    </LinearLayout>
+
+</android.support.constraint.ConstraintLayout>
