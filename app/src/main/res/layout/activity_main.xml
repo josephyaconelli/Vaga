@@ -61,7 +61,7 @@
                 android:layout_height="50dp"
                 android:background="#eee"
                 android:padding="5dp"
-                android:hint="@string/start_from"
+                android:hint="@string/start_from_hint"
                 android:id="@+id/destination_auto_complete"
                 android:name="com.google.android.gms.location.places.ui.PlaceAutocompleteFragment"
                 />

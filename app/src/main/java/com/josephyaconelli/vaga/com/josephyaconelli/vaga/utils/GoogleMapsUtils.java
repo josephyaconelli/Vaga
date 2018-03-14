@@ -33,6 +33,8 @@ public class GoogleMapsUtils {
 
         private static final String TAG = GoogleMapsUtils.class.getSimpleName();
 
+        public static List<Route> currentDirections = null;
+
         private static final String GOOGLE_MAPS_URL =
                 "https://maps.googleapis.com/maps/api/directions/json";
 
@@ -160,7 +162,7 @@ public class GoogleMapsUtils {
                 }
 
 
-
+                currentDirections = routes;
                 return routes;
 
             } catch (JSONException e) {
