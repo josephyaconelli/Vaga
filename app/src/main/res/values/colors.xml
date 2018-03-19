@@ -3,4 +3,19 @@
     <color name="colorPrimary">#3F51B5</color>
     <color name="colorPrimaryDark">#303F9F</color>
     <color name="colorAccent">#FF4081</color>
+    <color name="GrassGreen">#57BA4F</color>
+    <color name="ShadowBlue">#1A6B99</color>
+    <color name="BackgroundAqua">#40C0B5</color>
+    <color name="RoadGray">#6D6E71</color>
+    <color name="RiverBlue">#42A2DA</color>
+    <color name="ShadowGreen">#0B9444</color>
+    <color name="RoadWhite">#F3F3F4</color>
+    <color name="PaperShadow">#D1D2D4</color>
+    <color name="PaperReelBrown">#8B5E3B</color>
+    <color name="CloudGray">#E0E2E2</color>
+    <color name="MountainWhite">#FFFFFF</color>
+    <color name="MountainGrayMedium">#515153</color>
+    <color name="MountainGrayDark">#4E4E50</color>
+    <color name="MountainGrayLight">#58585A</color>
+    <color name="SunYellow">#F8EF22</color>
 </resources>

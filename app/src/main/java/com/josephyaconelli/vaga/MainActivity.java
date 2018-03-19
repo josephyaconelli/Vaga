@@ -1,50 +1,59 @@
 package com.josephyaconelli.vaga;
 
 import android.Manifest;
+import android.content.Intent;
 import android.content.pm.PackageManager;
-import android.graphics.Path;
+import android.graphics.drawable.ColorDrawable;
 import android.location.Location;
-import android.nfc.Tag;
 import android.os.AsyncTask;
 import android.os.Build;
 import android.support.annotation.RequiresApi;
 import android.support.v4.app.ActivityCompat;
+import android.support.v7.app.ActionBar;
 import android.support.v7.app.AppCompatActivity;
 import android.os.Bundle;
-import android.text.Html;
+import android.support.v7.widget.LinearLayoutManager;
+import android.support.v7.widget.RecyclerView;
 import android.util.Log;
 import android.view.Menu;
 import android.view.MenuInflater;
 import android.view.MenuItem;
 import android.view.View;
 import android.widget.Button;
-import android.widget.EditText;
 import android.widget.ProgressBar;
-import android.widget.TextView;
 
 import com.google.android.gms.common.api.Status;
 import com.google.android.gms.location.places.Place;
 import com.google.android.gms.location.places.ui.PlaceAutocompleteFragment;
 import com.google.android.gms.location.places.ui.PlaceSelectionListener;
+import com.josephyaconelli.vaga.com.josephyaconelli.vaga.RecentLocationAdapter;
+import com.josephyaconelli.vaga.com.josephyaconelli.vaga.data.AppDatabase;
+import com.josephyaconelli.vaga.com.josephyaconelli.vaga.data.AppDatabaseManager;
+import com.josephyaconelli.vaga.com.josephyaconelli.vaga.data.Directions;
+import com.josephyaconelli.vaga.com.josephyaconelli.vaga.data.RecentLocation;
 import com.josephyaconelli.vaga.com.josephyaconelli.vaga.utils.DirectionUtils;
 import com.josephyaconelli.vaga.com.josephyaconelli.vaga.utils.GoogleMapsUtils;
 import com.josephyaconelli.vaga.com.josephyaconelli.vaga.utils.Route;
-import com.josephyaconelli.vaga.com.josephyaconelli.vaga.utils.Step;
 
-import java.io.IOException;
 import java.net.URL;
 import java.util.List;
 
 public class MainActivity extends AppCompatActivity {
 
-    TextView mResultView;
+    RecyclerView mRecentLocationsRv;
+    RecentLocationAdapter mRecentLocationAdapter;
     Button mFromHereBtn;
     Button mGetDirectionsBtn;
     ProgressBar mDirectionsPb;
     PlaceAutocompleteFragment mDestinationAutoComplete;
     PlaceAutocompleteFragment mOriginAutoComplete;
+    AppDatabase database;
 
-    String mOriginStr, mDestinationStr;
+    long lastUpdate;
+
+    List<RecentLocation> mRecentLocations;
+
+    String mOriginStr, mDestinationStr, mOriginName, mOriginAddress, mDestinationName, mDestinationAddress;
 
 
     @Override
@@ -57,17 +66,41 @@ public class MainActivity extends AppCompatActivity {
                 PackageManager.PERMISSION_GRANTED);
 
 
-        mResultView = findViewById(R.id.result_tv);
+        database = AppDatabaseManager.getInstance(this);
+
+        lastUpdate = System.currentTimeMillis();
+
         mFromHereBtn = findViewById(R.id.fromhere_btn);
         mGetDirectionsBtn = findViewById(R.id.getdirection_btn);
         mDirectionsPb = findViewById(R.id.directions_pb);
         mDestinationAutoComplete = (PlaceAutocompleteFragment) getFragmentManager().findFragmentById(R.id.destination_auto_complete);
         mOriginAutoComplete = (PlaceAutocompleteFragment) getFragmentManager().findFragmentById(R.id.origin_auto_complete);
 
+        mRecentLocationsRv = (RecyclerView) findViewById(R.id.recent_location_rv);
+        LinearLayoutManager layoutManager = new LinearLayoutManager(this, LinearLayoutManager.VERTICAL, false);
+        mRecentLocationsRv.setLayoutManager(layoutManager);
+
+        mRecentLocationsRv.setHasFixedSize(true);
+
+        mRecentLocationAdapter = new RecentLocationAdapter();
+
+        mRecentLocationsRv.setAdapter(mRecentLocationAdapter);
+
+        new FetchRecentLocationsLast().execute();
+
+
         mOriginAutoComplete.setOnPlaceSelectedListener(new PlaceSelectionListener() {
             @Override
             public void onPlaceSelected(Place place) {
-                mOriginStr = place.getLatLng().toString();
+
+                mOriginAddress = place.getAddress().toString();
+                mOriginName = place.getName().toString();
+
+                if(mOriginAddress.contains(mOriginName)){
+                    mOriginAddress = mOriginAddress.substring(mOriginName.length() + 1);
+                }
+
+                mOriginStr = place.getAddress().toString();
             }
 
             @Override
@@ -79,8 +112,14 @@ public class MainActivity extends AppCompatActivity {
         mDestinationAutoComplete.setOnPlaceSelectedListener(new PlaceSelectionListener() {
             @Override
             public void onPlaceSelected(Place place) {
-                //Log.i("Place: ", place.getName());
-                mDestinationStr = place.getLatLng().toString();
+
+                mDestinationAddress = place.getAddress().toString();
+                mDestinationName = place.getName().toString();
+
+                if(mDestinationAddress.contains(mDestinationName)){
+                    mDestinationAddress = mDestinationAddress.substring(mDestinationName.length() + 1);
+                }
+                mDestinationStr = place.getAddress().toString();
             }
 
             @Override
@@ -95,8 +134,9 @@ public class MainActivity extends AppCompatActivity {
             @Override
             public void onClick(View view) {
 
-                String[] inputs = {mOriginStr, mDestinationStr};
+                String[] inputs = {mOriginStr, mOriginName, mDestinationStr, mDestinationName};
                 new FetchDirectionsTask().execute(inputs);
+
             }
         });
 
@@ -122,6 +162,18 @@ public class MainActivity extends AppCompatActivity {
         });
 
 
+
+
+
+    }
+
+
+    private void loadRecentLocations(){
+        mRecentLocationAdapter.setRecentLocations(mRecentLocations.toArray(new RecentLocation[0]));
+    }
+
+    private  void getRecentLocations(){
+        mRecentLocations = database.recentLocationsDao().getXMostRecent(10);
     }
 
 
@@ -141,26 +193,82 @@ public class MainActivity extends AppCompatActivity {
         int id = item.getItemId();
 
         if(id == R.id.action_refresh){
-            DirectionUtils utils = new DirectionUtils(this);
-
-            Location l = utils.getLocation();
-            mResultView.setText("Lat: " + l.getLatitude() + " Long: " + l.getLongitude());
-
-            //URL url = GoogleMapsUtils.buildUrl("Disneyland", "Eugene+OR");
-            String[] inputs = {"Disneyland", "Eugene OR"};
-            new FetchDirectionsTask().execute(inputs);
-
-            /*
-            try {
-                String response = GoogleMapsUtils.getResponseFromHttpUrl(url);
-                mLocationView.setText(response);
-            } catch (IOException e) {
-                e.printStackTrace();
-            }*/
+            //mResultView.setText("");
+            mOriginAutoComplete.setText("");
+            mDestinationAutoComplete.setText("");
+            mOriginStr = "";
+            mDestinationStr = "";
 
         }
 
         return super.onOptionsItemSelected(item);
+    }
+
+    public class FetchRecentLocationsLast extends  AsyncTask<Void, Void, Void> {
+
+        @Override
+        protected void onPreExecute(){
+            super.onPreExecute();
+            showProgressBar();
+        }
+
+        @Override
+        protected Void doInBackground(Void... voids) {
+            getRecentLocations();
+            return null;
+        }
+
+        protected void onPostExecute(Void aVoid) {
+            showResults();
+            loadRecentLocations();
+
+        }
+    }
+
+    public class AddRecentLocationsTask extends AsyncTask<String, Void, Void> {
+
+        @Override
+        protected void onPreExecute(){
+            super.onPreExecute();
+        }
+
+        @Override
+        protected Void doInBackground(String... params) {
+
+            long currentTime = System.currentTimeMillis();
+            lastUpdate = currentTime;
+
+            RecentLocation originL = new RecentLocation(mOriginStr,
+                    currentTime,
+                    mOriginStr,
+                    mOriginName,
+                    mOriginAddress,
+                    true);
+            RecentLocation destinationL = new RecentLocation(mDestinationStr,
+                    currentTime + 1,
+                    mDestinationStr,
+                    mDestinationName,
+                    mDestinationAddress,
+                    false);
+
+            if(database.recentLocationsDao().updateRecentLocations(originL) == 0){
+                database.recentLocationsDao().insertAll(originL);
+            }
+            if(database.recentLocationsDao().updateRecentLocations(destinationL) == 0){
+                database.recentLocationsDao().insertAll(destinationL);
+            }
+
+            getRecentLocations();
+
+            return null;
+
+        }
+
+        @Override
+        protected void onPostExecute(Void aVoid) {
+            loadRecentLocations();
+
+        }
     }
 
 
@@ -182,9 +290,14 @@ public class MainActivity extends AppCompatActivity {
             }
 
             String origin = params[0];
-            String destination = params[1];
+            String destination = params[2];
+
             String key = getApplicationContext().getResources().getText(R.string.GoogleMapApiKey).toString();
             URL weatherRequestUrl = GoogleMapsUtils.buildUrl(origin, destination, key);
+
+            new AddRecentLocationsTask().execute(params);
+
+
 
             try {
                 String jsonDirections = GoogleMapsUtils
@@ -194,6 +307,8 @@ public class MainActivity extends AppCompatActivity {
                 Log.d("DIRECTIONS_TAG", jsonDirections);
 
                 List<Route> routes = GoogleMapsUtils.getParsed(jsonDirections);
+
+                Directions.setRoutes(routes);
 
                 return routes;
 
@@ -206,35 +321,32 @@ public class MainActivity extends AppCompatActivity {
         @Override
         protected void onPostExecute(List<Route> directionData) {
             showResults();
-            if (directionData != null) {
-
-                Route route = directionData.get(0);
-                mResultView.setText("");
-                    for(Step step: route.steps){
-                    mResultView.append(Html.fromHtml(step.html_instructions));
-                    mResultView.append("\n\n");
-                }
-
-                /*
-                 * Iterate through the array and append the Strings to the TextView. The reason why we add
-                 * the "\n\n\n" after the String is to give visual separation between each String in the
-                 * TextView. Later, we'll learn about a better way to display lists of data.
-                 */
-                //mForecastAdapter.setWeatherData(weatherData);
-            } else {
-                //showErrorMessage();
+            if (directionData == null) {
+                showErrorMessage();
             }
+
+            Class directionsActivity = DirectionsActivity.class;
+
+            Intent loadDirectionsActivity = new Intent(MainActivity.this, directionsActivity);
+            startActivity(loadDirectionsActivity);
+
         }
+    }
+
+    private void showErrorMessage() {
+     //   mResultView.setText("Oops! Something went wrong :/");
+     //   mResultView.setTextColor(Color.LTGRAY);
     }
 
 
     private void showResults(){
         mDirectionsPb.setVisibility(View.GONE);
-        mResultView.setVisibility(View.VISIBLE);
+        mRecentLocationsRv.setVisibility(View.VISIBLE);
     }
 
     private void showProgressBar(){
-        mResultView.setVisibility(View.INVISIBLE);
+     //   mResultView.setVisibility(View.INVISIBLE);
+        mRecentLocationsRv.setVisibility(View.INVISIBLE);
         mDirectionsPb.setVisibility(View.VISIBLE);
     }
 
