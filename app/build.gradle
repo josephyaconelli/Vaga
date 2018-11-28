@@ -4,7 +4,7 @@ android {
     compileSdkVersion 26
     defaultConfig {
         applicationId "com.josephyaconelli.vaga"
-        minSdkVersion 19
+        minSdkVersion 26
         targetSdkVersion 26
         versionCode 1
         versionName "1.0"
@@ -22,6 +22,8 @@ dependencies {
     compile 'com.google.android.gms:play-services-places:9.4.0'
     compile 'com.google.code.gson:gson:2.8.2'
     compile 'com.android.support:recyclerview-v7:26.1.0'
+    compile 'com.android.support:design:26.1.0'
+
     implementation "android.arch.persistence.room:runtime:1.0.0"
     annotationProcessor "android.arch.persistence.room:compiler:1.0.0"
 

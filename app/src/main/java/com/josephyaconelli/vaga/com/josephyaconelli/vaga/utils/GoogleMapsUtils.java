@@ -143,9 +143,14 @@ public class GoogleMapsUtils {
                         Step step = new Step();
                         JSONObject thisStep =stepArray.getJSONObject(i);
 
-                        step.distance = thisStep.getJSONObject("distance").getInt("value");
-                        step.duration = thisStep.getJSONObject("duration").getInt("value");
+                        step.distance = new Distance(thisStep.getJSONObject("distance").getString("text"), thisStep.getJSONObject("distance").getInt("value"));
+
+                        step.duration = new Duration(thisStep.getJSONObject("duration").getString("text"), thisStep.getJSONObject("duration").getInt("value"));
                         step.html_instructions = thisStep.getString("html_instructions");
+
+                        step.start_location = new LatLng(thisStep.getJSONObject("start_location").getDouble("lat"), thisStep.getJSONObject("start_location").getDouble("lng"));
+
+                        step.end_location = new LatLng(thisStep.getJSONObject("end_location").getDouble("lat"), thisStep.getJSONObject("end_location").getDouble("lng"));
 
                         if(thisStep.has("maneuver")) {
                             step.setManeuver(thisStep.getString("maneuver"));

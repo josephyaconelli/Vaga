@@ -2,10 +2,38 @@
 <menu xmlns:android="http://schemas.android.com/apk/res/android"
     xmlns:app="http://schemas.android.com/apk/res-auto">
 
+
     <item
-        android:id="@+id/action_refresh"
+        android:id="@+id/total_duration_menuitem"
         android:orderInCategory="1"
-        android:title="@string/refresh"
-        app:showAsAction="ifRoom"/>
+        android:title="Time Left"
+        android:titleCondensed="Cancel"
+        app:showAsAction="ifRoom"
+        android:enabled="true"
+        android:tooltipText="time to destination"
+        android:icon="@android:drawable/ic_lock_idle_alarm"
+        />
+
+    <item
+        android:id="@+id/total_distance_menuitem"
+        android:orderInCategory="1"
+        android:title="13 miles"
+        android:titleCondensed="Cancel"
+        app:showAsAction="ifRoom"
+        android:enabled="true"
+        android:tooltipText="distance destination"
+        android:icon="@android:drawable/ic_menu_directions"
+        />
+
+    <item
+        android:id="@+id/end_navigation_menuitem"
+        android:orderInCategory="1"
+        android:title="Exit Route"
+        android:titleCondensed="Cancel"
+        app:showAsAction="ifRoom"
+        android:enabled="true"
+        android:tooltipText="cancel navigation"
+        android:icon="@android:drawable/ic_menu_close_clear_cancel"
+        />
 
 </menu>

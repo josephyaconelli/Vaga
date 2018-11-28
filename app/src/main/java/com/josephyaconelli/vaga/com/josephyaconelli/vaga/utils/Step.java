@@ -9,8 +9,8 @@ import com.google.android.gms.maps.model.LatLng;
 public class Step {
 
     public String html_instructions;
-    public int distance;
-    public int duration;
+    public Distance distance;
+    public Duration duration;
     public LatLng start_location;
     public LatLng end_location;
     public Maneuver maneuver;

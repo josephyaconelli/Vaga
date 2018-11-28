@@ -8,12 +8,27 @@
     tools:context="com.josephyaconelli.vaga.MainActivity">
 
 
+
     <LinearLayout
         android:layout_width="match_parent"
         android:layout_height="match_parent"
         android:orientation="vertical"
         android:padding="10dp"
         >
+
+        <TextView
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:text="Where are you headed..?"
+            android:paddingBottom="10dp"
+            android:fontFamily="cursive"
+            android:layout_marginBottom="10dp"
+            android:background="@drawable/content_container"
+            android:textSize="30sp"
+            android:gravity="center_horizontal"
+            android:textStyle="bold"
+            android:textColor="@color/ShadowBlue"
+            />
 
         <LinearLayout
             android:layout_width="wrap_content"
@@ -57,6 +72,7 @@
                 android:background="@color/BackgroundAqua"
                 android:textColor="@color/MountainWhite"
                 android:text="@string/from_here"
+                android:elevation="5dp"
                 android:drawableLeft="@android:drawable/ic_menu_mylocation"
                 />
 

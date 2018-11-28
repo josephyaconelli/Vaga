@@ -34,11 +34,14 @@ import com.josephyaconelli.vaga.com.josephyaconelli.vaga.data.RecentLocation;
 import com.josephyaconelli.vaga.com.josephyaconelli.vaga.utils.DirectionUtils;
 import com.josephyaconelli.vaga.com.josephyaconelli.vaga.utils.GoogleMapsUtils;
 import com.josephyaconelli.vaga.com.josephyaconelli.vaga.utils.Route;
+import com.josephyaconelli.vaga.com.josephyaconelli.vaga.utils.UpdateDirectionsService;
 
 import java.net.URL;
 import java.util.List;
 
 public class MainActivity extends AppCompatActivity {
+
+    static final boolean TESTING = true;
 
     RecyclerView mRecentLocationsRv;
     RecentLocationAdapter mRecentLocationAdapter;
@@ -58,6 +61,15 @@ public class MainActivity extends AppCompatActivity {
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
+
+
+        if(TESTING){
+            Intent i = new Intent(this, UpdateDirectionsService.class);
+            i.putExtra("KEY1", "value to be used later");
+            this.startService(i);
+        }
+
+
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_main);
 
@@ -192,14 +204,6 @@ public class MainActivity extends AppCompatActivity {
 
         int id = item.getItemId();
 
-        if(id == R.id.action_refresh){
-            //mResultView.setText("");
-            mOriginAutoComplete.setText("");
-            mDestinationAutoComplete.setText("");
-            mOriginStr = "";
-            mDestinationStr = "";
-
-        }
 
         return super.onOptionsItemSelected(item);
     }

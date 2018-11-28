@@ -1,12 +1,17 @@
 package com.josephyaconelli.vaga.com.josephyaconelli.vaga.utils;
 
 import android.Manifest;
+import android.app.job.JobInfo;
+import android.app.job.JobScheduler;
+import android.content.ComponentName;
 import android.content.Context;
 import android.content.pm.PackageManager;
 import android.location.Location;
 import android.location.LocationListener;
 import android.location.LocationManager;
+import android.os.Build;
 import android.os.Bundle;
+import android.support.annotation.RequiresApi;
 import android.support.v4.app.ActivityCompat;
 import android.support.v4.content.ContextCompat;
 import android.widget.Toast;
@@ -23,6 +28,27 @@ public class DirectionUtils {
     Location mLastLocation;
     LocationListener mLocationListener;
 
+
+    public static boolean isCloseOrPast(Step currentStep, Location currentLocation){
+        double thresh = 9*(10^(-6)); // approximately 1 meter in LatLng degrees
+        thresh *= 50; // 50 meters threshold
+
+        if ((Math.abs(currentStep.end_location.longitude - currentLocation.getLongitude()) <= thresh && Math.abs(currentStep.end_location.latitude - currentLocation.getLatitude()) <= thresh)
+
+                || (((currentLocation.getLatitude() > Math.max(currentStep.end_location.latitude, currentStep.start_location.latitude))
+                || (currentLocation.getLatitude() < Math.min(currentStep.end_location.latitude, currentStep.start_location.latitude)))
+
+                && ((currentLocation.getLongitude() > Math.max(currentStep.end_location.longitude, currentStep.start_location.longitude))
+                || ((currentLocation.getLongitude() < Math.min(currentStep.end_location.longitude, currentStep.start_location.longitude)))))){
+            return true;
+        }
+
+        return false;
+
+
+
+
+    }
 
     public DirectionUtils(Context context){
         mContext = context;
@@ -102,6 +128,18 @@ public class DirectionUtils {
         }
     }
 
+
+
+    @RequiresApi(api = Build.VERSION_CODES.M)
+    public static void scheduleJob(Context context){
+        ComponentName serviceComponent = new ComponentName(context, UpdateDirectionsService.class);
+        JobInfo.Builder builder = new JobInfo.Builder(0, serviceComponent);
+        builder.setMinimumLatency(1 * 1000);
+        builder.setOverrideDeadline(3 * 1000);
+
+        JobScheduler jobScheduler = context.getSystemService(JobScheduler.class);
+        jobScheduler.schedule(builder.build());
+    }
 
 
 

@@ -51,7 +51,7 @@ public class DirectionsAdapter extends RecyclerView.Adapter<DirectionsAdapter.Di
 
     @Override
     public void onBindViewHolder(DirectionsAdapter.DirectionsAdapterViewHolder holder, int position) {
-        holder.mDistanceTv.setText(mileFormat.format(mSteps[position].distance * METERS_TO_MILES) + " mi");
+        holder.mDistanceTv.setText(mSteps[position].distance.text);
         holder.mMainDirectionTv.setText(Html.fromHtml(mSteps[position].html_instructions));
 
         int iconId = android.R.drawable.btn_star;
